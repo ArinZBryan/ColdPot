@@ -17,8 +17,6 @@ def init():
 	#userDesired = input("Desired User \n")
 	#passDesired = input("Desired Password \n")
 	#pageDesired = input("Desired Page Name \n")
-	userDesired = "17ABryan"
-	passDesired = "SilkyCat01"
 	pageDesired = e.MCBd
 	
 	driver.get("https://vle.rgshw.com/index.php")
