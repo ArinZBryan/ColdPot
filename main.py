@@ -69,30 +69,101 @@ def gapFill():
 
 def MultiChoiceBox(type,pageDesired):
 	if type == "D":
-		sBoxes = []
-		sBoxes.append(driver.find_elements_by_tag_name("select"))
-		index = len(sBoxes)-1
-		sBoxes[0].pop(index)
-		Answers = []
-		iteration = 0
-		complete = False
+		#Finds Multichoice boxes
+		i = 0
+		compleye = False
 		while complete == False:
-			for i in range(len(sBoxes[0])-1):
-				curBox = sBoxes[0][i]
+			try:
+				element = Select(driver.find_element_by_id("s"+str(i)+"_"+str(i)))
+				elem.append(element)
+				i += 1
+			except:
+				complete = True
+
+		#Finds how many options each multichoice has
+		options = []
+		for j in range(len(elem)):
+			options.append(None)
+			complete = False
+			i = 0
+			while complete == False:
 				try:
-					Select(curBox)
-					curBox.select_by_index(iteration)
-					Answers.append(iteration)
+					element = Select(driver.find_element_by_id("s"+str(j)+"_"+str(j)))
+					element.select_by_value(str(i))
+					options[j] = i+1
+					i +=1
 				except:
 					complete = True
-			iteration += 1
-		driver.get(pageDesired)
-		for i in range(len(sBoxes)-1):
-			sBoxes[i].select_by_index(Answers[i])
+				driver.get(pageDesired)
 
+		#Solves Multichoice
+
+		answers = []
+		for j in range(max(options)+1):
+			for i in range(len(elem)):
+				try:
+					element = Select(driver.find_element_by_id("s"+str(i)+"_"+str(i)))
+					element.select_by_value(str(j))
+				except:
+					try:
+						value = answers.index(i)
+					except ValueError:
+						answers.append(i)
+			element = driver.find_element_by_id("CheckButton2")
+			element.click()
+
+		driver.get(pageDesired)
+
+		for i in range(len(elem)):
+			element = Select(driver.find_element_by_id("s"+str(i)+"_"+str(i)))
+			element.select_by_value(str(answers[i]))
+		driver.execute_script("CheckAnswers()")
 
 	elif type == "C":
-		pass
+		i = 0
+		while complete == False:
+			try:
+				element = Select(driver.find_element_by_id("Gap"+str(i)))
+				elem.append(element)
+				i += 1
+			except:
+				complete = True
+
+		#Finds how many options each multichoice has
+		options = []
+		for j in range(len(elem)):
+			options.append(None)
+			complete = False
+			i = 0
+			while complete == False:
+				try:
+					element = Select(driver.find_element_by_id("Gap"+str(j)))
+					element.select_by_value("GapContentId_"+str(i))
+					options[j] = i+1
+					i +=1
+				except:
+					complete = True
+		driver.get(pageDesired)
+
+		#Solves Multichoice
+
+		answers = []
+		for i in range(len(elem)):
+			answers.append(None)
+			for j in range(options[i]):
+				answers[i] = "GapContentId_" + str(j)
+				element = Select(driver.find_element_by_id("Gap" + str(i)))
+				element.select_by_value(answers[i])
+				driver.execute_script("CheckAnswers()")
+				try:
+					driver.find_element_by_id("Gap"+str(i))
+				except:
+					break
+		driver.get(pageDesired)
+		for i in range(len(elem)):
+			element = Select(driver.find_element_by_id("Gap" + str(i)))
+			element.select_by_value(answers[i])
+		driver.execute_script("CheckAnswers()")
 	elif type == "A":
 		I = driver.execute_script("return I")
 		for i in range(len(I)):
@@ -109,7 +180,6 @@ def MultiChoiceButton():
 			if Answers[i][j][1] == 'Alles klar! Sehr gut! ':
 				element = driver.find_element_by_id("Q_"+str(i)+"_"+str(j)+"_Btn")
 				element.click()
-
 
 if __name__ == "__main__" :
 	driver = webdriver.Chrome()

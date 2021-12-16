@@ -1,3 +1,4 @@
+
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
@@ -19,7 +20,7 @@ def init():
 	#pageDesired = input("Desired Page Name \n")
 	userDesired = "17ABryan"
 	passDesired = "SilkyCat01"
-	pageDesired = e.MCBd
+	pageDesired = e.MCBc
 	
 	driver.get("https://vle.rgshw.com/index.php")
 	element = driver.find_element_by_id("username")
@@ -35,34 +36,53 @@ pageDesired = init()
 complete = False
 i = 0
 elem = []
-while complete == False:
+
+#Finds Multichoice boxes
+""" while complete == False:
 	try:
-		element = Select(driver.find_element_by_id("s"+str(i)+"_"+str(i)))
+		element = Select(driver.find_element_by_id("Gap"+str(i)))
 		elem.append(element)
 		i += 1
 	except:
 		complete = True
-complete = False
-j = 0
-answers = []
-for i in range(len(elem)):
+
+#Finds how many options each multichoice has
+options = []
+for j in range(len(elem)):
+	options.append(None)
+	complete = False
+	i = 0
 	while complete == False:
 		try:
-			elem[i].select_by_value(str(j))
-			try:
-				element = driver.find_element_by_id("FeedbackOKButton")
-				element.click()
-				answers.append(j)
-			except:
-				j+=1
+			element = Select(driver.find_element_by_id("Gap"+str(j)))
+			element.select_by_value("GapContentId_"+str(i))
+			options[j] = i+1
+			i +=1
 		except:
 			complete = True
-while complete == False:
-	try:
-		element = Select(driver.find_element_by_id("s"+str(i)+"_"+str(i)))
-		element.select_by_value(str(answers[i]))
-		i += 1
-	except:
-		complete = True
-print("")
+driver.get(pageDesired)
 
+#Solves Multichoice
+
+answers = []
+for i in range(len(elem)):
+	answers.append(None)
+	for j in range(options[i]):
+		answers[i] = "GapContentId_" + str(j)
+		element = Select(driver.find_element_by_id("Gap" + str(i)))
+		element.select_by_value(answers[i])
+		driver.execute_script("CheckAnswers()")
+		try:
+			driver.find_element_by_id("Gap"+str(i))
+		except:
+			break
+driver.get(pageDesired)
+for i in range(len(elem)):
+	element = Select(driver.find_element_by_id("Gap" + str(i)))
+	element.select_by_value(answers[i])
+driver.execute_script("CheckAnswers()") """
+
+try: 
+	I = driver.execute_script("return I")
+except:
+	pass
