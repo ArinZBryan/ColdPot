@@ -86,3 +86,20 @@ try:
 	I = driver.execute_script("return I")
 except:
 	pass
+try:
+	gSpan = driver.find_elements_by_id("GapSpan")
+except:
+	pass
+try:
+	gBox = driver.find_elements_by_class_name("GapBox")	
+except:
+	pass
+try:
+	qs = driver.find_element_by_id("Questions")
+except:
+	pass
+try:
+	tf = driver.find_element_by_id("ShowMethodButton")
+	tf.click()
+except:
+	pass
