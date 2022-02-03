@@ -20,7 +20,7 @@ def init():
 	#pageDesired = input("Desired Page Name \n")
 	userDesired = "17ABryan"
 	passDesired = "SilkyCat01"
-	pageDesired = e.MCBc
+	pageDesired = e.gap
 	
 	driver.get("https://vle.rgshw.com/index.php")
 	element = driver.find_element_by_id("username")
@@ -38,14 +38,14 @@ i = 0
 elem = []
 
 #Finds Multichoice boxes
-""" while complete == False:
+while complete == False:
 	try:
 		element = Select(driver.find_element_by_id("Gap"+str(i)))
 		elem.append(element)
 		i += 1
 	except:
 		complete = True
-
+"""
 #Finds how many options each multichoice has
 options = []
 for j in range(len(elem)):
@@ -82,7 +82,50 @@ for i in range(len(elem)):
 	element.select_by_value(answers[i])
 driver.execute_script("CheckAnswers()") """
 
-try: 
-	I = driver.execute_script("return I")
-except:
+def arrEqual(answers,options):
+	for i in range(len(answers)):
+		if answers[i]!=options[i]:
+			return False
+	return True
+answers = I[0][1]
+answer = []
+for i in range(len(answers)):
+	answer.append(answers[i][0])
+answers = answer
+
+i = 0
+options = []
+complete = False
+pass
+while complete == False:
+	try:
+		element = Select(driver.find_element_by_id("Gap0"))
+		element.select_by_value("GapContentId_"+str(i))
+		options.append(element.first_selected_option.text)
+	except:
+		complete = True
+	i += 1
+if options == []:
 	pass
+	#Gap
+else:
+	if arrEqual(answers,options) == True:
+		#MCBc
+		pass
+	else:
+		#MCBa
+		pass
+
+try:
+	driver.find_element_by_id("Questions")
+	try:
+		driver.find_element_by_id("ShowMethodButton")
+		##MCc
+	except:
+		pass
+		##MCBd
+except:
+	pass	
+
+#Gap = if I contains only one element per question
+

@@ -5,10 +5,10 @@ from selenium.webdriver.support.ui import Select
 #Examples
 class examples:
 	def __init__(self):
-		self.gap ="https://vle.rgshw.com/mod/hotpot/attempt.php?id=73124"
-		self.MCBd ="https://vle.rgshw.com/mod/hotpot/attempt.php?id=71093"
-		self.MCBa ="https://vle.rgshw.com/mod/hotpot/attempt.php?id=67997"
-		self.MCBc ="https://vle.rgshw.com/mod/hotpot/attempt.php?id=73862"
+		self.gap ="https://vle.rgshw.com/mod/hotpot/attempt.php?id=73124" # N
+		self.MCBd ="https://vle.rgshw.com/mod/hotpot/attempt.php?id=71093" # Y
+		self.MCBa ="https://vle.rgshw.com/mod/hotpot/attempt.php?id=67997" # N
+		self.MCBc ="https://vle.rgshw.com/mod/hotpot/attempt.php?id=73862" # Y
 		self.MCc ="https://vle.rgshw.com/mod/hotpot/attempt.php?id=73865"
 		self.MCd =""
 
@@ -17,7 +17,9 @@ def init():
 	#userDesired = input("Desired User \n")
 	#passDesired = input("Desired Password \n")
 	#pageDesired = input("Desired Page Name \n")
-	pageDesired = e.MCBd
+	pageDesired = e.MCc
+	userDesired = "17ABryan"
+	passDesired = "SilkyCat01"
 	
 	driver.get("https://vle.rgshw.com/index.php")
 	element = driver.find_element_by_id("username")
@@ -54,6 +56,50 @@ def findQType():
 		pass
 	return [qType,elem]
 
+	
+	if I != None:
+		answers = I[0][1]
+		answer = []
+		for i in range(len(answers)):
+			answer.append(answers[i][0])
+		answers = answer
+
+		i = 0
+		options = []
+		complete = False
+		pass
+		while complete == False:
+			try:
+				element = Select(driver.find_element_by_id("Gap0"))
+				element.select_by_value("GapContentId_"+str(i))
+				options.append(element.first_selected_option.text)
+			except:
+				complete = True
+			i += 1
+		if options == []:
+			pass
+			qType = "Gap"
+		else:
+			if arrEqual(answers,options) == True:
+				qType = "MultiChoiceBox_C"
+				pass
+			else:
+				qType = "MultiChoiceBox_A"
+				pass
+
+	try:
+		driver.find_element_by_id("Questions")
+		try:
+			element = driver.find_element_by_id("ShowMethodButton")
+			driver.click()
+			qType = "MultiChoiceBox_D"
+		except:
+			pass
+			qType = "MultiChoiceButton"
+	except:
+		pass	
+	return [qType,driver.find_elements_by_id("GapSpan")]
+
 def gapFill():
 	I = driver.execute_script("return I")
 	Answers = []
@@ -69,7 +115,7 @@ def MultiChoiceBox(type,pageDesired):
 	if type == "D":
 		#Finds Multichoice boxes
 		i = 0
-		compleye = False
+		complete = False
 		while complete == False:
 			try:
 				element = Select(driver.find_element_by_id("s"+str(i)+"_"+str(i)))
@@ -119,6 +165,7 @@ def MultiChoiceBox(type,pageDesired):
 
 	elif type == "C":
 		i = 0
+		complete = False
 		while complete == False:
 			try:
 				element = Select(driver.find_element_by_id("Gap"+str(i)))
@@ -174,19 +221,30 @@ def MultiChoiceButton():
 	for i in range(len(I)):
 		Answers.append(I[i][3])
 		print(Answers[i])
-		for j in range(len(Answers[i])):
+		for j in range(len(Answers[i])-1):
 			if Answers[i][j][1] == 'Alles klar! Sehr gut! ':
 				element = driver.find_element_by_id("Q_"+str(i)+"_"+str(j)+"_Btn")
 				element.click()
+
+def arrEqual(answers,options):
+	for i in range(len(answers)):
+		if answers[i]!=options[i]:
+			return False
+	return True
 
 if __name__ == "__main__" :
 	driver = webdriver.Chrome()
 	pageDesired = init()
 	Answers = []
 	qNotType = []
+	try:
+		I = driver.execute_script("return I")
+	except:
+		I = None
 	fqt = findQType()
 	qType = fqt[0]
 	elem = fqt[1]
+	
 
 	if qType == "Gap":
 		gapFill()
