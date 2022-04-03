@@ -1,6 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
+from argparse import ArgumentParser
+from argparse import HelpFormatter
 
 #Examples
 class examples:
@@ -12,25 +14,41 @@ class examples:
 		self.MCc ="https://vle.rgshw.com/mod/hotpot/attempt.php?id=73865"
 		self.MCd =""
 
-def init():
-	e = examples()
+class SmartFormatter(HelpFormatter):
+	def _split_lines(self, text, width):
+		if text.startswith("R|"):
+			return text[2:].splitlines()  
+        # this is the RawTextHelpFormatter._split_lines
+		return HelpFormatter._split_lines(self, text, width)
+
+def init(*args):
+	if len(args) != 0:
+		if len(args) != 3:
+			raise Exception("Incorrect number of arguments provided to init function")
+		else:
+			pageDesired = args[0]
+			userDesired = args[1]
+			passDesired = args[2]
+	else:
+		e = examples()
+		pageDesired = e.MCc
+		userDesired = "17ABryan"
+		passDesired = "SilkyCat01"
+	
 	#userDesired = input("Desired User \n")
 	#passDesired = input("Desired Password \n")
 	#pageDesired = input("Desired Page Name \n")
-	pageDesired = e.MCc
-	userDesired = "17ABryan"
-	passDesired = "SilkyCat01"
 	
-	driver.get("https://vle.rgshw.com/index.php")
+	
+	driver.get(pageDesired)
 	element = driver.find_element_by_id("username")
 	element.send_keys(userDesired)
 	element = driver.find_element_by_id("password")
 	element.send_keys(passDesired, Keys.ENTER)
-	driver.get("https://vle.rgshw.com/course/view.php?id=3004")
-	driver.get(pageDesired)
+	
 	return pageDesired
 
-def findQType():
+def findQType():	#Overhaul needed
 	try:
 		elem = driver.find_elements_by_id("GapSpan")			#Current MultiChoice Format
 		qType = "MultiChoiceBox_C"
@@ -209,6 +227,7 @@ def MultiChoiceBox(type,pageDesired):
 			element = Select(driver.find_element_by_id("Gap" + str(i)))
 			element.select_by_value(answers[i])
 		driver.execute_script("CheckAnswers()")
+
 	elif type == "A":
 		I = driver.execute_script("return I")
 		for i in range(len(I)):
@@ -233,8 +252,23 @@ def arrEqual(answers,options):
 	return True
 
 if __name__ == "__main__" :
+	#Create Launch option parser
+	parser = ArgumentParser(description='test', formatter_class=SmartFormatter)
+
+	parser.add_argument('accname', metavar='username', type=str, help='the username of the desired account')
+	parser.add_argument('accpass', metavar='password', type=str, help='the password of the desired account')
+	parser.add_argument('url', metavar='url', type=str, help='the url of the activity')
+	parser.add_argument('-t', choices=['t', 'g', 'd'], default='t', help="R|The type of activity, where\n" " t -> Tickbox based\n" " g -> Gap-fill based\n" " d -> Dropdown")
+
+	args = parser.parse_args()
+
+	activityType = args.t
+	urldesired = args.url
+	accname = args.accname
+	accpass = args.accpass
+
 	driver = webdriver.Chrome()
-	pageDesired = init()
+	pageDesired = init(urldesired,accname,accpass)
 	Answers = []
 	qNotType = []
 	try:
