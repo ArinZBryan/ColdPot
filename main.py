@@ -31,7 +31,7 @@ def init(*args):
 			passDesired = args[2]
 	else:
 		e = examples()
-		pageDesired = e.MCc
+		pageDesired = e.MCBc
 		userDesired = "17ABryan"
 		passDesired = "SilkyCat01"
 	
@@ -48,75 +48,40 @@ def init(*args):
 	
 	return pageDesired
 
-def findQType():	#Overhaul needed
-	try:
-		elem = driver.find_elements_by_id("GapSpan")			#Current MultiChoice Format
-		qType = "MultiChoiceBox_C"
-		I = driver.execute_script("return I")					#AnswersAvailable MultiChoice Format
-		qType = "MultiChoiceBox_A"
-	except:
-		pass
-	try:
-		elem = driver.find_elements_by_class_name("GapBox")		#Try Gap Fill Solution
-		qType = "Gap"
-	except:
-		pass
-	try:
-		element = driver.find_element_by_id("Questions")		#Depricated MultiChoice Format
-		qType = "MultiChoiceBox_D"
-	except:
-		pass
-	try:
-		element =  driver.find_element_by_id("ShowMethodButton")#T/F MultiChoice Format
-		qType = "MultiChoiceButton"
-		element.click()
-	except:
-		pass
-	return [qType,elem]
+def findQType(basis):
 
-	
-	if I != None:
-		answers = I[0][1]
-		answer = []
-		for i in range(len(answers)):
-			answer.append(answers[i][0])
-		answers = answer
-
-		i = 0
-		options = []
-		complete = False
-		pass
-		while complete == False:
-			try:
-				element = Select(driver.find_element_by_id("Gap0"))
-				element.select_by_value("GapContentId_"+str(i))
-				options.append(element.first_selected_option.text)
-			except:
-				complete = True
-			i += 1
-		if options == []:
-			pass
-			qType = "Gap"
-		else:
-			if arrEqual(answers,options) == True:
-				qType = "MultiChoiceBox_C"
-				pass
-			else:
-				qType = "MultiChoiceBox_A"
-				pass
-
-	try:
-		driver.find_element_by_id("Questions")
+	if basis == "t":
 		try:
 			element = driver.find_element_by_id("ShowMethodButton")
-			driver.click()
+			element.click()
+			qType = "MultiChoiceButton"
+		except Exception as e:
+			print(e)
+			raise Exception("Wrong activity type")
+	elif basis == "g":
+		try:
+			element = driver.find_elements_by_class_name("GapBox")
+			qType = "Gap"
+		except Exception as e:
+			print(e)
+			raise Exception("Wrong activity type")
+	elif basis == "d":
+		try:
+			element = driver.find_elements_by_id("GapSpan")			#Current MultiChoice Format
+			qType = "MultiChoiceBox_C"
+			I = driver.execute_script("return I")					#AnswersAvailable MultiChoice Format
+			qType = "MultiChoiceBox_A"
+		except:
+			pass
+		try:
+			element = driver.find_element_by_id("Questions")		#Depricated MultiChoice Format
 			qType = "MultiChoiceBox_D"
 		except:
 			pass
-			qType = "MultiChoiceButton"
-	except:
-		pass	
-	return [qType,driver.find_elements_by_id("GapSpan")]
+	else:
+		raise Exception("No activity type specified, how the fuck did you get here?")
+	
+	return [qType,element]
 
 def gapFill():
 	I = driver.execute_script("return I")
@@ -127,11 +92,11 @@ def gapFill():
 		element = driver.find_element_by_id("Gap" + str(j))	
 		element.send_keys(Answers[j])						
 	driver.execute_script("CheckAnswers()")				
-	print("Done!")
 
 def MultiChoiceBox(type,pageDesired):
 	if type == "D":
 		#Finds Multichoice boxes
+		elem = []
 		i = 0
 		complete = False
 		while complete == False:
@@ -144,19 +109,19 @@ def MultiChoiceBox(type,pageDesired):
 
 		#Finds how many options each multichoice has
 		options = []
-		for j in range(len(elem)):
-			options.append(None)
-			complete = False
-			i = 0
-			while complete == False:
+		for j in range(len(elem)):		#For Each multichoice
+			options.append(None)	
+			complete = False		
+			i = 0					
+			while complete == False:	#While not all is found
 				try:
-					element = Select(driver.find_element_by_id("s"+str(j)+"_"+str(j)))
-					element.select_by_value(str(i))
-					options[j] = i+1
-					i +=1
+					element = Select(driver.find_element_by_id("s"+str(j)+"_"+str(j)))		#Select the option with that number
+					element.select_by_value(str(i))											
+					options[j] = i+1														#Log that it can be done
+					i +=1																	#
 				except:
 					complete = True
-				driver.get(pageDesired)
+		driver.get(pageDesired)
 
 		#Solves Multichoice
 
@@ -239,9 +204,8 @@ def MultiChoiceButton():
 	I = driver.execute_script("return I")	
 	for i in range(len(I)):
 		Answers.append(I[i][3])
-		print(Answers[i])
-		for j in range(len(Answers[i])-1):
-			if Answers[i][j][1] == 'Alles klar! Sehr gut! ':
+		for j in range(len(Answers[i])):
+			if Answers[i][j][2] == 1:
 				element = driver.find_element_by_id("Q_"+str(i)+"_"+str(j)+"_Btn")
 				element.click()
 
@@ -275,7 +239,7 @@ if __name__ == "__main__" :
 		I = driver.execute_script("return I")
 	except:
 		I = None
-	fqt = findQType()
+	fqt = findQType(activityType)
 	qType = fqt[0]
 	elem = fqt[1]
 	
@@ -290,5 +254,4 @@ if __name__ == "__main__" :
 		MultiChoiceBox("A",pageDesired)
 	elif qType == "MultiChoiceButton":
 		MultiChoiceButton()
-	print("e")
 	

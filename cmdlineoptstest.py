@@ -35,13 +35,8 @@ parser.add_argument('-t',choices=['t', 'g', 'd'], default='t',
 		 
 # Execute the parse_args() method
 args = parser.parse_args()
-print(args)
+
 activityType = args.t
 urldesired = args.url
 accname = args.accname
 accpass = args.accpass
-
-print(activityType)
-print(urldesired)
-print(accname)
-print(accpass)
