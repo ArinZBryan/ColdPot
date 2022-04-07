@@ -32,8 +32,6 @@ def init(*args):
 	else:
 		e = examples()
 		pageDesired = e.MCBc
-		userDesired = "17ABryan"
-		passDesired = "SilkyCat01"
 	
 	#userDesired = input("Desired User \n")
 	#passDesired = input("Desired Password \n")
